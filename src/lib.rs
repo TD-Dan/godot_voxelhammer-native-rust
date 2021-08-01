@@ -18,7 +18,8 @@ impl HelloWorld {
 
 
 fn init(handle: InitHandle) {
-	handle.add_class::<HelloWorld>();
+	godot_print!("VoxelHammer Native Rust loaded.");
+	handle.add_tool_class::<HelloWorld>();
 }
 
 godot_init!(init);
