@@ -7,6 +7,8 @@ use gdnative::api::SurfaceTool;
 
 use std::collections::HashMap;
 
+use itertools::Itertools; 
+
 #[derive(NativeClass)]
 #[inherit(Node)]
 #[user_data(user_data::MutexData<NativeWorkerRust>)]
@@ -77,10 +79,59 @@ impl NativeWorkerRust {
 								st.add_vertex(Vector3::new( (vert[0]+x)as f32, (vert[1]+y) as f32, (vert[2]+z) as f32));
 							}
 						}
+						if x == sx-1 || material.get(ci+1) == 0 {
+							for vert in CUBE_FACE_BACK.iter() {
+								st.add_uv(Vector2::new( 1.0 - (vert[2]+z) as f32 / largest_size, 1.0 - (vert[1]+y) as f32 / largest_size));
+								st.add_vertex(Vector3::new( (vert[0]+x)as f32, (vert[1]+y) as f32, (vert[2]+z) as f32));
+							}
+						}
+						if y == 0 || material.get(ci-sx) == 0 {
+							for vert in CUBE_FACE_BOTTOM.iter() {
+								st.add_uv(Vector2::new( 1.0 - (vert[0]+z) as f32 / largest_size, (vert[2]+y) as f32 / largest_size));
+								st.add_vertex(Vector3::new( (vert[0]+x)as f32, (vert[1]+y) as f32, (vert[2]+z) as f32));
+							}
+						}
+						if y == sy-1 || material.get(ci+sx) == 0 {
+							for vert in CUBE_FACE_TOP.iter() {
+								st.add_uv(Vector2::new( 1.0 - (vert[0]+z) as f32 / largest_size, 1.0 - (vert[2]+y) as f32 / largest_size));
+								st.add_vertex(Vector3::new( (vert[0]+x)as f32, (vert[1]+y) as f32, (vert[2]+z) as f32));
+							}
+						}
+						if z == 0 || material.get(ci-sx*sy) == 0 {
+							for vert in CUBE_FACE_LEFT.iter() {
+								st.add_uv(Vector2::new( 1.0 - (vert[0]+z) as f32 / largest_size, 1.0 - (vert[1]+y) as f32 / largest_size));
+								st.add_vertex(Vector3::new( (vert[0]+x)as f32, (vert[1]+y) as f32, (vert[2]+z) as f32));
+							}
+						}
+						if z == sz-1 || material.get(ci+sx*sy) == 0 {
+							for vert in CUBE_FACE_RIGHT.iter() {
+								st.add_uv(Vector2::new( (vert[0]+z) as f32 / largest_size, (vert[1]+y) as f32 / largest_size));
+								st.add_vertex(Vector3::new( (vert[0]+x)as f32, (vert[1]+y) as f32, (vert[2]+z) as f32));
+							}
+						}
 					}
 				}
 			}
 		}
+
+		let mut i = 0;
+		let mut material_table: Vec<i32> = Vec::new();
+		for (key, val) in surface_tools.iter().sorted() {	
+			val.generate_normals(false);
+			val.generate_tangents();
+			
+			mesh_buffer.add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, val.commit_to_arrays(), VariantArray::new().into_shared(), 97280);
+
+			//godot_print!("surf {} = mat {}", i, key);
+			material_table.push(*key);
+			i += 1;
+		}
+
+		// i = 0;
+		// for val in material_table.iter() {
+		// 	godot_print!("mat_table {} = {}", i, val);
+		// 	i += 1;
+		// }
 
 		return mesh_buffer;
 	}
