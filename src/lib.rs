@@ -33,7 +33,32 @@ impl NativeWorkerRust {
 		godot_print!("VoxelHammer Native Rust worker active.")
 	}
 
-	
+	#[export]
+	fn create_fill(&self, _owner: &Node, size: Vector3, start: Vector3, end: Vector3, new_material: i32, new_smooth: u8, mut material: Int32Array, mut smooth: ByteArray) -> VariantArray<Unique> {
+		let sx = size.x as i32;
+		let sy = size.y as i32;
+		let sz = size.z as i32;
+		let total = sx*sy*sz;
+
+		for z in 0..sz {
+			for y in 0..sy{
+				for x in 0..sx{
+					if x >= start.x as i32 && x < end.x as i32 && y >= start.y as i32 && y < end.y as i32 && z >= start.z as i32 && z < end.z as i32 {
+						material.set(x + y*sx + z*sx*sy, new_material);
+						if new_smooth != 0 {
+							smooth.set(x + y*sx + z*sx*sy, new_smooth);
+						}
+					}
+				}
+			}
+		}
+					
+		let retarray= VariantArray::new();
+		retarray.push(material);
+		retarray.push(smooth);
+		return retarray;
+	}
+
 	#[export]
 	fn create_vis(&self, _owner: &Node, size: Vector3,  material: Int32Array, mut visible: ByteArray) -> ByteArray {
 		let sx = size.x as i32;
