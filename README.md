@@ -1,4 +1,6 @@
 # godot_voxelhammer-native-rust
+! MULTIPLE COMMITS INCOMING BEFORE READY FOR USE !
+
 Native Rust implementation for speeding up VoxelHammer Godot plugin
 
 Currently only Win64 supported, should be trivial to port to other Godot targets.
