@@ -1,0 +1,9 @@
+[gd_resource type="NativeScript" load_steps=2 format=2]
+
+[ext_resource path="res://addons/voxel_hammer/gdnative/voxelhammer_native_rust.tres" type="GDNativeLibrary" id=1]
+
+[resource]
+class_name = "NativeWorkerRust"
+library = ExtResource( 1 )
+script_class_name = "NativeWorkerRust"
+script_class_icon_path = "res://addons/voxel_hammer/icon_vh.png"
